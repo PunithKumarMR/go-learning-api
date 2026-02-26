@@ -12,6 +12,6 @@ type Product struct {
 	Price     float64         `json:"price"`
 	Quantity  int             `json:"quantity"`
 	CreatedAt time.Time       `json:"-"`
-	UdatedAt  time.Time       `json:"-"`
+	UpdatedAt  time.Time       `json:"-"`
 	DeletedAt *gorm.DeletedAt `json:"-"`
 }
