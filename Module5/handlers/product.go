@@ -7,14 +7,13 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/v5"
 )
 
 func GetAllProducts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var products []models.Product
-	result := database.DB.First(&products)
+	result := database.DB.Find(&products)
 	if result.Error != nil {
 		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
 		return
@@ -39,7 +38,7 @@ func GetProduct(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(&product)
 }
 
-func CreateProduct(w http.ResponseWriter, r http.Request) {
+func CreateProduct(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var newProduct models.Product
 	err1 := json.NewDecoder(r.Body).Decode(&newProduct)
@@ -55,7 +54,7 @@ func CreateProduct(w http.ResponseWriter, r http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(newProduct)
 }
-func UpdateProduct(w http.ResponseWriter, r http.Request) {
+func UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
@@ -95,9 +94,9 @@ func DeleteProduct(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Product not found", http.StatusNotFound)
 		return
 	}
-	delete := database.DB.Delete(&Updated)
-	if delete.Error != nil {
-		http.Error(w, delete.Error.Error(), http.StatusInternalServerError)
+	result := database.DB.Delete(&Updated)
+	if result.Error != nil {
+		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
