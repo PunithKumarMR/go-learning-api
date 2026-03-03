@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: productsdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d productsdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  app:
+    build: .
+    ports:
+      - "8087:8087"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=admin
+      - DB_PASSWORD=password
+      - DB_NAME=productsdb
+      - JWT_SECRET=mysecretkey
+networks:
+  appnetworks:
+volumes:
+  postgres_data:
